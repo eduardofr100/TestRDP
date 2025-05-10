@@ -4,7 +4,8 @@ namespace Test_API.Repositories.Interfaces
 {
     public interface IFacturaRepository
     {
-        Task<IEnumerable<Factura>> FindFacturasByPersona(int personaId);
-        Task StoreFactura(Factura factura);
+        Task<IEnumerable<Factura>> FindFacturas();
+        Task<IEnumerable<Factura>> FindFacturasByPersona(int identificacion);
+        Task<bool> StoreFactura(Factura factura);
     }
 }

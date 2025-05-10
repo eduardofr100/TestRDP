@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using Test_API.Migrations;
 using Test_API.Models.Entities;
 using Test_API.Repositories.Interfaces;
@@ -14,6 +15,11 @@ namespace Test_API.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Factura>> FindFacturas()
+        {
+            return await _context.Facturas.ToListAsync();
+        }
+
         public async Task<IEnumerable<Factura>> FindFacturasByPersona(int personaId)
         {
             return await _context.Facturas
@@ -21,17 +27,15 @@ namespace Test_API.Repositories
                 .ToListAsync();
         }
 
-        public async Task StoreFactura(Factura factura)
+        public async Task<bool> StoreFactura(Factura factura)
         {
-            if (factura.IdFactura == 0)
-            {
-                await _context.Facturas.AddAsync(factura);
-            }
-            //else
-            //{
-            //    _context.Facturas.Update(factura);
-            //}
+            bool existe = await _context.Facturas
+                .AnyAsync(p => p.IdFactura == factura.IdFactura);
+            if (existe) return false;
+            await _context.Facturas.AddAsync(factura);
             await _context.SaveChangesAsync();
+            return true;
+
         }
     }
 }

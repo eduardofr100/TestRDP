@@ -17,7 +17,13 @@ namespace Test_API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Factura>>> GetByPersona(int personaId)
+        public async Task<ActionResult<IEnumerable<Factura>>> GetAll()
+        {
+            return Ok(await _facturaService.GetAllFacturas());
+        }
+
+        [HttpGet("{personaId}")]
+        public async Task<ActionResult<IEnumerable<Factura>>> GetByFactura(int personaId)
         {
             return Ok(await _facturaService.GetFacturasByPersona(personaId));
         }
@@ -31,8 +37,12 @@ namespace Test_API.Controllers
                 Monto = facturaDto.Monto,
                 PersonaId = facturaDto.PersonaId
             };
-            await _facturaService.SaveFactura(factura);
-            return CreatedAtAction(nameof(GetByPersona), new { id = factura.IdFactura }, factura);
+            bool success = await _facturaService.SaveFactura(factura);
+            if (!success)
+            {
+                return BadRequest("No se pudo guardar la persona.");
+            }
+            return CreatedAtAction(nameof(GetByFactura), new { personaId = factura.PersonaId }, factura);
         }
     }
 }

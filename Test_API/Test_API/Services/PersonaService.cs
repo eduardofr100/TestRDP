@@ -17,19 +17,24 @@ namespace Test_API.Services
             return await _personaRepository.FindPersonaByIdentificacion(identificacion);
         }
 
+        public async Task<IEnumerable<Persona>> SearchPersonasAsync(string search)
+        {
+            return await _personaRepository.SearchPersonasAsync(search);
+        }
+
         public async Task<IEnumerable<Persona>> GetAllPersonas()
         {
             return await _personaRepository.FindPersonas();
         }
 
-        public async Task DeletePersona(string identificacion)
+        public async Task<bool> DeletePersona(string identificacion)
         {
-            await _personaRepository.DeletePersonaByIdentificacion(identificacion);
+             return await _personaRepository.DeletePersonaByIdentificacion(identificacion);
         }
 
-        public async Task SavePersona(Persona persona)
+        public async Task<bool> SavePersona(Persona persona)
         {
-            await _personaRepository.StorePersona(persona);
+             return await _personaRepository.StorePersona(persona);
         }
     }
 }

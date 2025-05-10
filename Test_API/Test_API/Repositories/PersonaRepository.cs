@@ -20,6 +20,18 @@ namespace Test_API.Repositories
                 .FirstOrDefaultAsync(p => p.Identificacion == identificacion);
         }
 
+        public async Task<IEnumerable<Persona>> SearchPersonasAsync(string search)
+        {
+            return await _context.Personas
+                .Where(p =>
+                    p.Identificacion.Contains(search) ||
+                    p.Nombre.Contains(search) ||
+                    p.ApellidoPaterno.Contains(search) ||
+                    p.ApellidoMaterno.Contains(search) 
+                )
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Persona>> FindPersonas()
         {
             return await _context.Personas.ToListAsync();
@@ -32,27 +44,24 @@ namespace Test_API.Repositories
                 .FirstOrDefaultAsync(p => p.Identificacion == identificacion);
         }
 
-        public async Task DeletePersonaByIdentificacion(string identificacion)
+        public async Task<bool> DeletePersonaByIdentificacion(string identificacion)
         {
             var persona = await DeleteByIdentificacion(identificacion);
-            if (persona != null)
-            {
-                _context.Personas.Remove(persona);
-                await _context.SaveChangesAsync();
-            }
+            if (persona == null) return false;
+            _context.Personas.Remove(persona);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task StorePersona(Persona persona)
+        public async Task<bool> StorePersona(Persona persona)
         {
-            if (persona.IdPersona == 0)
-            {
-                await _context.Personas.AddAsync(persona);
-            }
-            //else
-            //{
-            //    _context.Personas.Update(persona);
-            //}
+            bool existe = await _context.Personas
+                .AnyAsync(p => p.Identificacion == persona.Identificacion);
+            if (existe) return false; 
+
+            await _context.Personas.AddAsync(persona);
             await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

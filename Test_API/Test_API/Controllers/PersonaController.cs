@@ -27,6 +27,17 @@ namespace Test_API.Controllers
             return Ok(persona);
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Persona>>> Search([FromQuery] string search)
+        {
+            var personas = await _personaService.SearchPersonasAsync(search);
+            if (!personas.Any())
+            {
+                return NotFound();
+            }
+            return Ok(personas);
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Persona>>> GetAll()
         {
@@ -43,15 +54,19 @@ namespace Test_API.Controllers
                 ApellidoMaterno = personaDto.ApellidoMaterno,
                 Identificacion = personaDto.Identificacion
             };
-            await _personaService.SavePersona(persona);
+            bool success = await _personaService.SavePersona(persona);
+            if (!success)
+            {
+                return BadRequest("No se pudo guardar la persona.");
+            }
             return CreatedAtAction(nameof(GetByIdentificacion), new { identificacion = persona.Identificacion }, persona);
         }
 
         [HttpDelete("{identificacion}")]
         public async Task<IActionResult> Delete(string identificacion)
         {
-            await _personaService.DeletePersona(identificacion);
-            return NoContent();
+            bool success = await _personaService.DeletePersona(identificacion);
+            return success ? NoContent() : NotFound();
         }
     }
 }
